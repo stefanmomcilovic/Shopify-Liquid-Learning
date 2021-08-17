@@ -1,0 +1,118 @@
+{% layout none %}
+{% include 'stefan' %}
+
+{% assign trigger_product = all_products[settings.trigger_product] %}
+{% assign free_gift = all_products[settings.free_gift] %}
+
+{% assign isGiftProductInCart = false %}
+{% assign isTriggerProductInCart = false %}
+
+{% for cart_items in cart.items %}
+    {% if cart_items.product.id == trigger_product.id %}
+        {% assign isTriggerProductInCart = true %}
+    {% endif %}
+    {% if cart_items.product.id == free_gift.id %}
+        {% assign isGiftProductInCart = true %}
+    {% endif %}
+{% endfor %}
+
+
+{% if isTriggerProductInCart == true and isGiftProductInCart != true %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        var free_gift_variant_id = "{{ free_gift.selected_or_first_available_variant.id }}";
+        $.post("/cart/update.js", "updates[" + free_gift_variant_id + "]=1",
+            function (response) {
+                loadPopUp();
+            });
+    });
+</script>
+{% endif %}
+
+{% if isTriggerProductInCart != true and isGiftProductInCart == true%}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var free_gift_variant_id = "{{ free_gift.selected_or_first_available_variant.id }}";
+            $.post("/cart/update.js", "updates[" + free_gift_variant_id + "]=0",
+                function (response) {
+                    loadPopUp();
+                });
+        });
+    </script>
+{% endif %}
+
+<div class="Cart_Header">
+    <p>Your cart</p><label for="cart_drawer_action">&#10005;</label>
+</div>
+
+<div class="Cart_Content">
+    {% for item in cart.items %}
+    <div class="Cart_Items">
+        <div class="Cart_Item {% if item.product.metafields.recommended.origin %} recommended-item {% endif %}">
+
+            <div class="row">
+                <div class="col-sm-4 text-center">
+                    <img src="{{ item | img_url: 'x190' }}" alt="{{ item.image.alt | escape }}"
+                        class="{% if item.image == null %} hide{% endif %}" />
+
+                    <p>{{ item.title | escape }}</p>
+                    {% assign property_size = item.properties | size %}
+                    {% if property_size > 0 %}
+                        {% for p in item.properties %}
+                        {% assign first_character_in_key = p.first | truncate: 1, '' %}
+
+                        {% unless p.last == blank or first_character_in_key == '_' %}
+                        <span class="item-properties">
+                            {% if p.last contains '/uploads/' %}
+                            <a class="lightbox" href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                            {% else %}
+                            {{ p.last }}
+                            {% endif %}
+                        </span>
+                        <br>
+                        {% endunless %}
+
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {% if item.product.metafields.freegift == empty %}
+                    <div class="col-sm-4 text-center">
+                        <input type="hidden" class="regular-item">
+                        <button class="Qty_Minus btn text-center w-100" data-variant-id="{{ item.variant_id }}">-</button>
+                        <input class="Qty_value text-center" type="text" value="{{ item.quantity | escape }}" name="qty">
+                        <button class="Qty_Plus btn text-center w-100" data-variant-id="{{ item.variant_id }}">+</button>
+                    </div>
+                {% else %}
+                    <div class="col-sm-4 text-center mt-5">
+                        <input class="text-center" type="text" value="{{ item.quantity | escape }}" readonly>
+                    </div>
+                {% endif %}
+
+                <div class="col-sm-4 text-center mt-4">
+                    <p class="mb-3">Single item price: {{ item.price | money }}</p>
+                    <p>Total item price: {{ item.price | times: item.quantity | money}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="row w-100 text-center justify-content-center">
+        <div class="col-sm-12">
+            {% include "add-features-product" %}
+        </div>
+    </div>
+
+</div>
+
+<div class="Cart_Footer">
+    <div class="Cart_Totals"><span>Subtotal: </span><span id="Price">{{ cart.total_price | money_with_currency }}</span>
+    </div>
+    <div class="Checkout_Btn">
+        <a href="/checkout">CHECKOUT</a>
+    </div>
+    <div class="Continue_Shopping_Btn">
+        <label for="cart_drawer_action">Continue Shopping</label>
+    </div>
+</div>

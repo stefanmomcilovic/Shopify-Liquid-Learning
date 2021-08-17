@@ -1,0 +1,176 @@
+<div class="product-template__container w-100 px-5" id="ProductSection-{{ section.id }}"
+    data-section-id="{{ section.id }}" data-section-type="product" data-enable-history-state="true"
+    data-ajax-enabled="{{ settings.enable_ajax }}">
+    <div class="bundleProducts row">
+
+        <div class="container col-sm-6 justify-content-start">
+            <h2 class="text-center">Available Items</h2>
+            <div class="row">
+                {% if section.blocks.size > 0 %}
+                {% for block in section.blocks %}
+                {% if block.settings.bundle_product != blank %}
+                {% assign bundle_product = all_products[block.settings.bundle_product] %}
+                <div class="col-sm-4 Product_Item mt-3 text-center">
+                    <img class="bundle-item-img" src="{{ bundle_product.featured_image | img_url: "190x" }}"
+                        alt="{{ product.title }}">
+                    <p class="bundle-item-title">{{ bundle_product.title }}</p>
+                    <p class="bundle-prev-price">
+                        {% if bundle_product.compare_at_price >  bundle_product.price %}
+                        {{ bundle_product.compare_at_price | money }}
+                        {% endif %}
+                    </p>
+                    <p class="bundle-item-price">{{ bundle_product.price | money }}</p>
+                    <input type="button" value="Add to bundle" class="btn btn-dark addToBundleBox"
+                        data-product-id="{{ bundle_product.id }}">
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="Bundle_Form col-sm-6 justify-content-end">
+            <h1 class="text-center">Items In bundle pack</h1>
+            <div class="container">
+                <div class="row" id="BundleBoxItems">
+
+                    <!-- <div class="Product_Item_Bundle col-sm-4 mt-3 text-center">
+                        <img class="bundle-box-item-image" src="https://via.placeholder.com/190" alt="Alt">
+                        <p class="bundle-box-item-title">Product title</p>
+                        <p class="bundle-box-item-price">$40.00</p>
+                        <input type="hidden" name="bundle_item" class="bundle-box-item-id" data-bundle-item-id="">
+                    </div> -->
+
+                    <!-- <div class="col-sm-12">
+                        <p class="check-out-price mt-2 text-end">Total price: <strong> $420.00 </strong></p>
+                        <form action="#" method="post" class="mt-3">
+                            <div class="form-group text-center">
+                                <input type="button" value="Add to cart" id="AddToCartBundleItems" class="btn btn-dark">
+                            </div>
+                        </form>
+                    </div> -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Creating Bundle Pack //
+        $(".addToBundleBox").click(function (e) {
+            e.preventDefault();
+
+            var product_image = $(this).siblings(".bundle-item-img").attr("src");
+            var product_title = $(this).siblings(".bundle-item-title").text();
+            var product_price = $(this).siblings(".bundle-item-price").text();
+            var product_id = $(this).data("product-id");
+
+            var bundle_box = $("#BundleBoxItems");
+            var bundle_box_items = $(".Product_Item_Bundle");
+            var add_to_cart_trigger = false;
+
+            if (bundle_box && bundle_box_items.length <= 5) {
+                bundle_box.append(
+                    "<div class='Product_Item_Bundle col-sm-4 mt-3 text-center'><div class='removeBtnContainer w-100 text-end'><input type='button' name='removeItem' value='X' class='btn removeBundleItemBtn'></div><img class='bundle-box-item-image' src='" +
+                    product_image + "' alt='" + product_title +
+                    "'><p class='bundle-properties d-none hidden'>" + product_title +
+                    " -</p><p class='bundle-box-item-title'>" + product_title +
+                    " </p><p class='bundle-box-item-price'>" + product_price +
+                    "</p><input type='hidden' name='bundle_item' class='bundle-box-item-id' data-bundle-item-id='" +
+                    product_id + "'></div>");
+
+                add_to_cart_trigger = true;
+
+                $(".removeBundleItemBtn").click(function (e) {
+                    e.preventDefault();
+                    var parent = $(this).parent().parent();
+                    parent.remove();
+
+                    if (bundle_box_items.length < 6) {
+                        add_to_cart_trigger = false;
+                        $("#addToCartBundle").remove();
+                    }
+                });
+            }
+
+
+            if (bundle_box_items.length >= 5 && add_to_cart_trigger == true) {
+                add_to_cart_trigger = false;
+                bundle_box.append('<div id="addToCartBundle" class="col-sm-12">' +
+                    '<p class="check-out-price mt-2 text-end">Total price: <strong class="total-bundle-price">{{ product.price | money }}</strong></p>' +
+                    '<div class="add-to-cart-instant text-center">' +
+                    '<form method="post" action="/cart/add" id="BundleToCart">' +
+                    '<input type="hidden" name="id" id="product_id" value="{{ product.variants.first.id }}" />' +
+                    '<label for="quantity">Qty: </label>' +
+                    '<input min="1" type="number" id="quantity" name="quantity" value="1" />' +
+                    '<input type="submit" value="Add to cart" id="bundleAddToCart" class="btn btn-dark" />' +
+                    '</form>' +
+                    '</div></div>');
+
+                var product_titles = $(".Product_Item_Bundle .bundle-properties").text();
+                var properties = product_titles.split("-");
+                properties.pop();
+                var properties_string = '';
+
+                for (var i = 0; i < properties.length; i++) {
+                    if (properties[i] != ' ' || properties[i] != '') {
+                        if (i == 0) {
+                            properties_string += "1. " + properties[i];
+                        } else {
+                            properties_string += i * 1 + 1 + ". " + properties[i];
+                        }
+                    }
+                }
+
+
+                $("#bundleAddToCart").click(function (e) {
+                    e.preventDefault();
+                    var product_id = $(this).siblings("#product_id").val();
+                    var quantity = $(this).siblings("#quantity").val();
+
+                    $.post('/cart/add.js', {
+                        items: [{
+                            quantity: quantity,
+                            id: product_id,
+                            properties: {
+                                "Bundle pack": properties_string
+                            }
+                        }]
+                    }, function (response) {
+                        loadPopUp();
+                    }).fail(function(response) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Something was happend please try again later!',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+                });
+            }
+        });
+    // End of Creating Bundle Pack //
+    }); 
+</script>
+
+{% schema %}
+{
+    "name": "Bundle Items",
+    "max_blocks": 6,
+    "blocks": [
+        {
+            "name": "Bundle product",
+            "type": "product",
+            "settings": [
+                {
+                    "type": "product",
+                    "id": "bundle_product",
+                    "label": "Select your bundle product"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}

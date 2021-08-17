@@ -1,0 +1,179 @@
+{% style %}
+    .Recommended-Items{
+       position: relative;
+       /*display: flex;*/
+       margin: 30px auto 15px;
+       padding: 40px 25px;
+       background: rgba(213, 198, 198, 0.4);
+       border-radius: 15px;
+    }
+
+    .Recommended-Items .Item-Image{
+        /*flex-basis: 30%;*/
+        padding-right: 15px;
+    }
+
+    .Recommended-Items .Item-Description{
+      /*flex-basis: 40%;*/
+      padding-left: 15px;
+      margin-top: 15px;
+    }
+
+    .Recommended-Items .Item-Description p {
+        margin: 0;
+    }
+
+    .Recommended-Items .Add-Recommended-Item-To-Cart{
+        /*flex-basis: 25%;
+        display: flex;
+        justify-content: center;
+        align-items: center; */
+    }
+
+    .Recommended-Items .Add-Recommended-Item-To-Cart button{
+        height: 40px;
+    }
+
+    .Recommended-Items .Item-Description .recommended-prev-price{
+        color: #f00;
+        text-decoration: line-through;
+    }
+
+    .Recommended-Items .Item-Description .recommended-price{
+        color: #02a402;
+    }
+
+{% endstyle %}
+{% comment %}
+    Adding recommended items to cart,
+        Firstly we check if we have in cart more than 0 item
+
+    metafields.must_be_changes_for_products
+{% endcomment %}
+{%- if cart.item_count > 0 -%}
+        {% assign allow_upsell = false %}
+
+        {%- for cart_item in cart.items -%}
+            {% if cart_item.product.metafields.recommended.origin %}
+                {% continue %}
+            {% endif %}
+            {% assign allow_upsell = true %}
+        {% endfor %}
+        {% if allow_upsell %}
+
+            {% comment %}
+                Adding recommended items that we want to show adding it by product handle 
+            {% endcomment %}
+
+           {% capture upsell_product_handles %}
+                
+                {% assign collection_handle = 'recommended-products' %}
+                {% for product in collections[collection_handle].products %}
+                    {% if product.available == true %}
+                        {{ product.handle | append: " " }}
+                    {% endif %}
+                {% endfor %}
+
+            {% endcapture %}
+
+
+            {% comment %}
+                Creating array by added items
+            {% endcomment %}
+            {% assign upsell_product_handles_array = upsell_product_handles | split: ' ' %}
+
+            {% comment %}
+                Checking item key in array to see if item already exists in cart if exist then we will not show that item as recommended
+            {% endcomment %}
+
+            {% assign keys_to_remove = '' %}
+            {% assign increment = 0 %}
+            
+            {% for upsell_handle in upsell_product_handles_array %}
+                {% assign upsell_product = all_products[upsell_handle] %}
+                {% assign related_product = all_products[upsell_product.metafields.recommended.origin] %}
+
+                {% for fe_item in cart.items %}
+                    {% if fe_item.product.id == related_product.id %}
+                        {% assign keys_to_remove = keys_to_remove | append: increment | append: ' ' %}
+                    {% elsif fe_item.product.id == upsell_product.id %}
+                        {% assign keys_to_remove = keys_to_remove | append: increment | append: ' ' %}
+                    {% endif %}
+                {% endfor %}
+
+                {% assign increment = increment | plus: 1 %}
+
+                {% endfor%}
+
+            {% comment %}
+                Checking if item has been removed from cart to bring them back into recommended items
+            {% endcomment %}
+
+            {% assign keys_to_remove_array = keys_to_remove | split: ' ' %}
+            {% assign upsell_next = '' %}
+
+            {% assign inc_key = 0 %}
+        
+            {% for upsell_handle in upsell_product_handles_array %}
+                {% assign remove_item = false %}
+
+                {% for key_remove in keys_to_remove_array %}
+                    {% assign key_int = key_remove | times: 1 %}
+
+                    {% if key_int == inc_key %}
+                        {% assign remove_item = true %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if remove_item == false %}
+                    {% assign upsell_next = upsell_next | append: upsell_handle | append: ' ' %}
+                {% endif %}
+
+                {% assign inc_key = inc_key | plus: 1 %}
+            {% endfor %}
+
+            {% comment %}
+                Checking removed item priority in recommended items that will be showed to user
+            {% endcomment %}
+
+            {% assign upsell_next_array = upsell_next | split: ' ' %}
+            {% assign priority = all_products[upsell_next_array[0]].metafields.recommended.priority | plus: 0 %}
+
+            {% assign upsell_key = 0 %}
+            {% assign upsell_next_key = 0 %}
+
+            {% for upsell_handle in upsell_next_array %}
+                {% assign upsell_product = all_products[upsell_handle] %}
+                {% assign upsell_product_priority = upsell_product.metafields.recommended.priority | plus: 0 %}
+
+                {% if priority > upsell_product_priority %}
+                    {% assign priority = upsell_product_priority %}
+                    {% assign upsell_next_key = upsell_key | plus: 0 %}
+                {% endif %}
+
+                {% assign upsell_key = upsell_key | plus: 1 %}
+            {% endfor %}
+
+            {% comment %}
+                Finally we got related items to our recommended items and we show them
+            {% endcomment %}
+            {% assign upsell_next_product = all_products[upsell_next_array[upsell_next_key]] %}
+            {% assign related_next_product = all_products[upsell_next_product.metafields.recommended.origin] %}
+
+            {% if upsell_next_product.title != blank %}
+                <div class="Recommended-Items">
+                    <div class="Item-Image">
+                        <img src="{{ upsell_next_product | img_url: '190x'}}" alt="{{ upsell_next_product.title }}">
+                    </div>
+                    <div class="Item-Description">
+                        <p class="title mb-1">{{  upsell_next_product.title }}</p>
+                        <p class="recommended-prev-price">{{ upsell_next_product.compare_at_price | money }}</p>
+                        <p class="recommended-price mb-2">{{ upsell_next_product.price | money }}</p>
+                    </div>
+                    <div class="Add-Recommended-Item-To-Cart">
+                        <button id="add-recommended-item" class="btn btn-dark" data-recommended-item-id="{{ upsell_next_product.selected_or_first_available_variant.id }}">ADD</button>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+{%- endif -%}
