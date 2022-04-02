@@ -207,6 +207,69 @@
           "show_locale_selector": true,
           "show_currency_selector": true
         }
+      },
+      "collection-template": {
+        "type": "collection-template",
+        "settings": {
+          "layout": "grid",
+          "grid": 4,
+          "rows": 2,
+          "show_collection_image": true,
+          "show_vendor": false,
+          "sort_enable": true,
+          "tags_enable": true
+        }
+      },
+      "bundle-template": {
+        "type": "bundle-template",
+        "blocks": {
+          "cb1747e9-9f45-4ab4-b7d3-70df1204194d": {
+            "type": "product",
+            "settings": {
+              "bundle_product": "adidas-classic-backpack"
+            }
+          },
+          "7f7259df-c9e7-4e18-ab1d-c37becdd5e68": {
+            "type": "product",
+            "settings": {
+              "bundle_product": "adidas-classic-backpack-legend-ink-multicolour"
+            }
+          },
+          "407a4528-7eea-4b33-9971-00939167b6f7": {
+            "type": "product",
+            "settings": {
+              "bundle_product": "adidas-kids-stan-smith"
+            }
+          },
+          "78de3992-5bab-4515-9f41-0f5a596771af": {
+            "type": "product",
+            "settings": {
+              "bundle_product": "adidas-superstar-80s"
+            }
+          },
+          "7164b598-2cef-4d17-aa45-cd5176bb3622": {
+            "type": "product",
+            "settings": {
+              "bundle_product": "awesome-sneakers-1"
+            }
+          },
+          "b0b9e958-dd3d-4f46-bda1-75d5d703ccc9": {
+            "type": "product",
+            "settings": {
+              "bundle_product": "asics-tiger-gel-lyte-v-30-years-of-gel-pack"
+            }
+          }
+        },
+        "block_order": [
+          "cb1747e9-9f45-4ab4-b7d3-70df1204194d",
+          "7f7259df-c9e7-4e18-ab1d-c37becdd5e68",
+          "407a4528-7eea-4b33-9971-00939167b6f7",
+          "78de3992-5bab-4515-9f41-0f5a596771af",
+          "7164b598-2cef-4d17-aa45-cd5176bb3622",
+          "b0b9e958-dd3d-4f46-bda1-75d5d703ccc9"
+        ],
+        "settings": {
+        }
       }
     },
     "content_for_index": [
@@ -224,7 +287,8 @@
       "sections": {
         "header": {
           "type": "header",
-          "settings": {}
+          "settings": {
+          }
         },
         "hero-1": {
           "type": "hero",
@@ -235,22 +299,26 @@
         },
         "feature-row": {
           "type": "feature-row",
-          "settings": {}
+          "settings": {
+          }
         },
         "feature-columns": {
           "type": "feature-columns",
           "blocks": {
             "feature-columns-0": {
               "type": "text_block",
-              "settings": {}
+              "settings": {
+              }
             },
             "feature-columns-1": {
               "type": "text_block",
-              "settings": {}
+              "settings": {
+              }
             },
             "feature-columns-2": {
               "type": "text_block",
-              "settings": {}
+              "settings": {
+              }
             }
           },
           "block_order": [
@@ -279,15 +347,18 @@
           "blocks": {
             "quotes-0": {
               "type": "quote",
-              "settings": {}
+              "settings": {
+              }
             },
             "quotes-1": {
               "type": "quote",
-              "settings": {}
+              "settings": {
+              }
             },
             "quotes-2": {
               "type": "quote",
-              "settings": {}
+              "settings": {
+              }
             }
           },
           "block_order": [
@@ -304,15 +375,18 @@
           "blocks": {
             "image-bar-0": {
               "type": "image",
-              "settings": {}
+              "settings": {
+              }
             },
             "image-bar-1": {
               "type": "image",
-              "settings": {}
+              "settings": {
+              }
             },
             "image-bar-2": {
               "type": "image",
-              "settings": {}
+              "settings": {
+              }
             }
           },
           "block_order": [
@@ -320,18 +394,21 @@
             "image-bar-1",
             "image-bar-2"
           ],
-          "settings": {}
+          "settings": {
+          }
         },
         "footer": {
           "type": "footer",
           "blocks": {
             "footer-0": {
               "type": "link_list",
-              "settings": {}
+              "settings": {
+              }
             },
             "footer-1": {
               "type": "newsletter",
-              "settings": {}
+              "settings": {
+              }
             }
           },
           "block_order": [
@@ -482,20 +559,23 @@
         },
         "1492033809691": {
           "type": "map",
-          "settings": {}
+          "settings": {
+          }
         },
         "1492033877875": {
           "type": "quotes",
           "blocks": {
             "1492033877875-0": {
               "type": "quote",
-              "settings": {}
+              "settings": {
+              }
             }
           },
           "block_order": [
             "1492033877875-0"
           ],
-          "settings": {}
+          "settings": {
+          }
         },
         "1492033924902": {
           "type": "custom-content",
@@ -521,15 +601,18 @@
           "blocks": {
             "1492096252560-0": {
               "type": "featured_collection",
-              "settings": {}
+              "settings": {
+              }
             },
             "1492096252560-1": {
               "type": "featured_collection",
-              "settings": {}
+              "settings": {
+              }
             },
             "1492096252560-2": {
               "type": "featured_collection",
-              "settings": {}
+              "settings": {
+              }
             }
           },
           "block_order": [
@@ -557,26 +640,23 @@
             "show_share_buttons": true
           }
         },
-        "cart-template": {
-          "type": "cart-template",
-          "settings": {
-            "cart_notes_enable": false
-          }
-        },
         "footer": {
           "type": "footer",
           "blocks": {
             "link_list": {
               "type": "link_list",
-              "settings": {}
+              "settings": {
+              }
             },
             "text": {
               "type": "text",
-              "settings": {}
+              "settings": {
+              }
             },
             "newsletter": {
               "type": "newsletter",
-              "settings": {}
+              "settings": {
+              }
             }
           },
           "block_order": [
