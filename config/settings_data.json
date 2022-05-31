@@ -265,7 +265,15 @@
       "hero-1",
       "feature-row",
       "collection"
-    ]
+    ],
+    "blocks": {
+      "8897894491940704904": {
+        "type": "shopify:\/\/apps\/bundle-products-bundle-builder\/blocks\/app-embeded\/2dbaca96-b795-4e4f-8b87-2ccff57d5193",
+        "disabled": false,
+        "settings": {
+        }
+      }
+    }
   },
   "presets": {
     "Default": {
