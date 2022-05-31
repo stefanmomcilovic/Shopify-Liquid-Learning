@@ -1,0 +1,295 @@
+<div class="product-template__container page-width"
+  id="ProductSection-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  data-section-type="product"
+  data-enable-history-state="true"
+  data-ajax-enabled="{{ settings.enable_ajax }}"
+>
+  {% comment %}
+    Get first variant, or deep linked one
+  {% endcomment %}
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
+  {%- assign product_image_zoom_size = '1024x1024' -%}
+  {%- assign product_image_scale = '2' -%}
+  {%- assign enable_image_zoom = section.settings.enable_image_zoom -%}
+  {%- assign compare_at_price = current_variant.compare_at_price -%}
+  {%- assign price = current_variant.price -%}
+
+  {% case section.settings.media_size %}
+    {% when 'small' %}
+      {%- assign product_media_width = 'medium-up--one-third' -%}
+      {%- assign product_description_width = 'medium-up--two-thirds' -%}
+      {%- assign height = 345 -%}
+    {% when 'medium' %}
+      {%- assign product_media_width = 'medium-up--one-half' -%}
+      {%- assign product_description_width = 'medium-up--one-half' -%}
+      {%- assign height = 530 -%}
+    {% when 'large' %}
+      {%- assign product_media_width = 'medium-up--two-thirds' -%}
+      {%- assign product_description_width = 'medium-up--one-third' -%}
+      {%- assign height = 720 -%}
+    {% when 'full' %}
+      {%- assign product_media_width = '' -%}
+      {%- assign product_description_width = '' -%}
+      {%- assign height = 1090 -%}
+      {%- assign enable_image_zoom = false -%}
+  {% endcase %}
+
+  <div class="grid product-single{% if section.settings.enable_payment_button %} product-single--{{ section.settings.media_size }}-media{% endif %}">
+    <div class="grid__item product-single__media-group {{ product_media_width }}{% if section.settings.media_size == 'full' %} product-single__media-group--full{% endif %}" data-product-single-media-group>
+      {%- assign featured_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+
+      {%- for media in product.media -%}
+        {% include 'media', media: media, featured_media: featured_media, height: height, enable_image_zoom: enable_image_zoom, image_zoom_size: product_image_zoom_size, image_scale: product_image_scale %}
+      {%- endfor -%}
+
+      <noscript>
+        {% capture product_image_size %}{{ height }}x{% endcapture %}
+        <img src="{{ featured_media | img_url: product_image_size, scale: product_image_scale }}" alt="{{ featured_media.alt }}" id="FeaturedMedia-{{ section.id }}" class="product-featured-media" style="max-width: {{ height }}px;">
+      </noscript>
+
+      {% assign first_3d_model = product.media | where: "media_type", "model" | first %}
+
+      {%- if first_3d_model -%}
+        <button
+          aria-label="{{ 'products.product.view_in_space_label' | t }}"
+          class="product-single__view-in-space"
+          data-shopify-xr
+          data-shopify-model3d-id="{{ first_3d_model.id }}"
+          data-shopify-title="{{ product.title | escape }}"
+          data-shopify-xr-hidden
+        >
+          {% include 'icon-3d-badge-full-color' %}<span class='product-single__view-in-space-text'>{{ 'products.product.view_in_space' | t }}</span>
+        </button>
+      {%- endif -%}
+
+
+      {% if product.media.size > 1 %}
+        {% if product.media.size > 4 %}
+          {%- assign enable_thumbnail_slides = true -%}
+        {% endif %}
+
+        <div data-thumbnail-slider>
+          <div class="thumbnails-wrapper{% if enable_thumbnail_slides == true %} slider-active{% endif %}" data-slider>
+            {% if enable_thumbnail_slides == true %}
+              <button type="button" class="btn btn--link medium-up--hide thumbnails-slider__btn thumbnails-slider__prev thumbnails-slider__prev--{{ section.id }}" data-slider-button>
+                {% include 'icon-chevron-left' %}
+                <span class="icon__fallback-text">{{ 'sections.slideshow.previous_slide' | t }}</span>
+              </button>
+            {% endif %}
+
+            <ul class="product-single__thumbnails product-single__thumbnails-{{ section.id }}" data-slider-container>
+              {% if enable_thumbnail_slides == true %}
+                <div class="product-single__thumbnails-slider-track" data-slider-track>
+              {% endif %}
+
+              {% for media in product.media %}
+                <li class="product-single__thumbnails-item product-single__thumbnails-item--{{ section.settings.media_size }} {% if enable_thumbnail_slides == true %} product-single__thumbnails-item-slide{% endif %} js"{% if enable_thumbnail_slides == true %} data-slider-slide-index="{{ forloop.index0 }}" data-slider-item{% endif %}>
+                  <a href="{{ media.preview_image | img_url: product_image_zoom_size, scale: product_image_scale }}"
+                    class="text-link product-single__thumbnail product-single__thumbnail--{{ section.id }}"
+                    data-thumbnail-id="{{ section.id }}-{{ media.id }}"
+                    {% if enable_thumbnail_slides == true %} data-slider-item-link{% endif %}
+                    {% if enable_image_zoom %}data-zoom="{{ media.preview_image | img_url: product_image_zoom_size, scale: product_image_scale }}"{% endif %}>
+
+                      {%- capture thumbnailAlt -%}
+                        {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+                          {{ 'sections.featured_product.video_thumbnail_alt' | t: imageAlt: media.alt | escape }}
+                        {%- elsif media.media_type == 'model' -%}
+                          {{ 'sections.featured_product.model_thumbnail_alt' | t: imageAlt: media.alt | escape }}
+                        {%- else -%}
+                          {{ 'sections.featured_product.gallery_thumbnail_alt' | t: imageAlt: media.alt | escape }}
+                        {%- endif -%}
+                      {%- endcapture -%}
+
+                      <img class="product-single__thumbnail-image" src="{{ media.preview_image | img_url: '110x110', scale: 2 }}" alt="{{ thumbnailAlt }}">
+                      {%- if media.media_type == 'video' or media.media_type =='external_video' -%}
+                        <div class="product-single__thumbnail-badge">
+                          {% include 'icon-video-badge-full-color' %}
+                        </div>
+                      {%- endif -%}
+                      {%- if media.media_type == 'model' -%}
+                        <div class="product-single__thumbnail-badge">
+                          {% include 'icon-3d-badge-full-color' %}
+                        </div>
+                      {%- endif -%}
+                  </a>
+                </li>
+              {% endfor %}
+
+              {% if enable_thumbnail_slides == true %}
+                </div>
+              {% endif %}
+            </ul>
+            {% if enable_thumbnail_slides == true %}
+              <button type="button" class="btn btn--link medium-up--hide thumbnails-slider__btn thumbnails-slider__next thumbnails-slider__next--{{ section.id }}" data-slider-button data-slider-button-next>
+                {% include 'icon-chevron-right' %}
+                <span class="icon__fallback-text">{{ 'sections.slideshow.next_slide' | t }}</span>
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="grid__item {{ product_description_width }}">
+      <div class="product-single__meta">
+
+        <h1 class="product-single__title">{{ product.title }}</h1>
+        <script>window.performance.mark('debut:product:title_visible');</script>
+
+          <div class="product__price">
+            {% include 'product-price', variant: current_variant, show_vendor: section.settings.show_vendor %}
+          </div>
+
+          {%- if cart.taxes_included or shop.shipping_policy.body != blank -%}
+            <div class="product__policies rte" data-product-policies>
+              {%- if cart.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+              {%- endif -%}
+              {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {% capture "form_classes" -%}
+            product-form product-form-{{ section.id }}
+            {%- if section.settings.enable_payment_button and product.has_only_default_variant %} product-form--payment-button-no-variants {%- endif -%}
+            {%- if current_variant.available == false %} product-form--variant-sold-out {%- endif -%}
+          {%- endcapture %}
+
+          {% form 'product', product, class:form_classes, novalidate: 'novalidate', data-product-form: '' %}
+            {{ form | payment_terms }}
+
+            {% unless product.has_only_default_variant %}
+              <div class="product-form__controls-group">
+                {% for option in product.options_with_values %}
+                  <div class="selector-wrapper js product-form__item">
+                    <label for="SingleOptionSelector-{{ forloop.index0 }}">
+                      {{ option.name }}
+                    </label>
+                    <select class="single-option-selector single-option-selector-{{ section.id }} product-form__input"
+                      id="SingleOptionSelector-{{ forloop.index0 }}"
+                      data-index="option{{ forloop.index }}"
+                    >
+                      {% for value in option.values %}
+                        <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endunless %}
+
+            <select name="id" id="ProductSelect-{{ section.id }}" class="product-form__variants no-js">
+              {% for variant in product.variants %}
+                <option value="{{ variant.id }}"
+                  {%- if variant == current_variant %} selected="selected" {%- endif -%}
+                >
+                  {{ variant.title }}  {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+                </option>
+              {% endfor %}
+            </select>
+
+            {% if section.settings.show_quantity_selector %}
+              <div class="product-form__controls-group">
+                <div class="product-form__item">
+                  <label for="Quantity-{{ section.id }}">{{ 'products.product.quantity' | t }}</label>
+                  <input type="number" id="Quantity-{{ section.id }}"
+                    name="quantity" value="1" min="1" pattern="[0-9]*"
+                    class="product-form__input product-form__input--quantity" data-quantity-input
+                  >
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="product-form__error-message-wrapper product-form__error-message-wrapper--hidden{% if section.settings.enable_payment_button %} product-form__error-message-wrapper--has-payment-button{% endif %}"
+              data-error-message-wrapper
+              role="alert"
+            >
+              <span class="visually-hidden">{{ 'general.accessibility.error' | t }} </span>
+              {% include 'icon-error' %}
+              <span class="product-form__error-message" data-error-message>{{ 'products.product.quantity_minimum_message' | t }}</span>
+            </div>
+
+            <div class="product-form__controls-group product-form__controls-group--submit">
+              <div class="product-form__item product-form__item--submit
+                {%- if section.settings.enable_payment_button %} product-form__item--payment-button {%- endif -%}
+                {%- if product.has_only_default_variant %} product-form__item--no-variants {%- endif -%}"
+              >
+                <button type="submit" name="add"
+                  {% unless current_variant.available %} aria-disabled="true"{% endunless %}
+                  aria-label="{% unless current_variant.available %}{{ 'products.product.sold_out' | t }}{% else %}{{ 'products.product.add_to_cart' | t }}{% endunless %}"
+                  class="btn product-form__cart-submit{% if section.settings.enable_payment_button and product.selling_plan_groups == empty %} btn--secondary-accent{% endif %} addItemToCart"
+                  {% if settings.enable_ajax %}aria-haspopup="dialog"{% endif %}
+                  data-add-to-cart="{{ product.selected_or_first_available_variant.id }}">
+                  <span data-add-to-cart-text>
+                    {% unless current_variant.available %}
+                      {{ 'products.product.sold_out' | t }}
+                    {% else %}
+                      {{ 'products.product.add_to_cart' | t }}
+                    {% endunless %}
+                  </span>
+                  <span class="hide" data-loader>
+                    {% include 'icon-spinner' %}
+                  </span>
+                </button>
+
+                {% if section.settings.enable_payment_button %}
+                  {{ form | payment_button }}
+                {% endif %}
+              </div>
+            </div>
+          {% endform %}
+        </div>
+
+        {%- comment -%}
+          Live region for announcing updated price and availability to screen readers
+        {%- endcomment -%}
+        <p class="visually-hidden" data-product-status
+          aria-live="polite"
+          role="status"
+        ></p>
+
+        {%- comment -%}
+          Live region for announcing that the product form has been submitted and the
+          product is in the process being added to the cart
+        {%- endcomment -%}
+        <p class="visually-hidden" data-loader-status
+          aria-live="assertive"
+          role="alert"
+          aria-hidden="true"
+        >{{ 'products.product.loader_label' | t }}</p>
+
+        <div
+          class="product-single__store-availability-container"
+          data-store-availability-container
+          data-product-title="{{ product.title | escape }}"
+          data-has-only-default-variant="{{ product.has_only_default_variant }}"
+          data-base-url="{{ shop.url }}{{ routes.root_url }}"
+        >
+        </div>
+
+        <div class="product-single__description rte">
+          {{ product.description }}
+        </div>
+
+        {% if section.settings.show_share_buttons %}
+          {% include 'social-sharing', share_title: product.title, share_permalink: product.url, share_image: product.featured_media %}
+        {% endif %}
+    </div>
+  </div>
+</div>
+
+{% unless product == empty %}
+  <script type="application/json" id="ProductJson-{{ section.id }}">
+    {{ product | json }}
+  </script>
+  <script type="application/json" id="ModelJson-{{ section.id }}">
+    {{ product.media | where: 'media_type', 'model' | json }}
+  </script>
+{% endunless %}
+
+
+
+{% schema %}{"name": {"cs": "Str\u00e1nky produkt\u016f", "da": "Produktsider", "de": "Produktseiten", "en": "Product pages", "es": "P\u00e1ginas de productos", "fi": "Tuotesivut", "fr": "Pages de produits", "it": "Pagine del prodotto", "ja": "\u5546\u54c1\u30da\u30fc\u30b8", "ko": "\uc81c\ud488 \ud398\uc774\uc9c0", "nb": "Produktsider", "nl": "Productpagina's", "pl": "Strony produktu", "pt-BR": "P\u00e1ginas de produtos", "pt-PT": "P\u00e1ginas de produtos", "sv": "Produktsidor", "th": "\u0e2b\u0e19\u0e49\u0e32\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32", "tr": "\u00dcr\u00fcn sayfalar\u0131", "vi": "Trang s\u1ea3n ph\u1ea9m", "zh-CN": "\u4ea7\u54c1\u9875\u9762", "zh-TW": "\u7522\u54c1\u9801\u9762"}, "settings": [{"type": "checkbox", "id": "show_quantity_selector", "label": {"cs": "Zobrazit v\u00fdb\u011br mno\u017estv\u00ed", "da": "Vis antalsv\u00e6lger", "de": "Mengenauswahl anzeigen", "en": "Show quantity selector", "es": "Mostrar selector de cantidad", "fi": "N\u00e4yt\u00e4 m\u00e4\u00e4r\u00e4n valitsin", "fr": "Afficher le s\u00e9lecteur de quantit\u00e9", "it": "Mostra selettore quantit\u00e0", "ja": "\u6570\u91cf\u30bb\u30ec\u30af\u30bf\u30fc\u3092\u8868\u793a\u3059\u308b", "ko": "\uc218\ub7c9 \uc120\ud0dd\uae30 \ud45c\uc2dc", "nb": "Vis mengdevelger", "nl": "Hoeveelheidskiezer weergeven", "pl": "Poka\u017c selektor ilo\u015bci", "pt-BR": "Exibir seletor de quantidade", "pt-PT": "Mostrar um seletor de quantidade", "sv": "Visa kvantitetsv\u00e4ljare", "th": "\u0e41\u0e2a\u0e14\u0e07\u0e15\u0e31\u0e27\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e08\u0e33\u0e19\u0e27\u0e19", "tr": "Adet se\u00e7iciyi g\u00f6ster", "vi": "Hi\u1ec3n th\u1ecb h\u1ed9p ch\u1ecdn s\u1ed1 l\u01b0\u1ee3ng", "zh-CN": "\u663e\u793a\u6570\u91cf\u9009\u62e9\u5668", "zh-TW": "\u986f\u793a\u6578\u91cf\u9078\u64c7\u5668"}, "default": false}, {"type": "checkbox", "id": "show_vendor", "label": {"cs": "Zobrazit dodavatele", "da": "Vis leverand\u00f8r", "de": "Lieferanten anzeigen", "en": "Show vendor", "es": "Mostrar proveedor", "fi": "N\u00e4yt\u00e4 myyj\u00e4", "fr": "Afficher les vendeurs", "it": "Mostra fornitore", "ja": "\u8ca9\u58f2\u5143\u3092\u8868\u793a\u3059\u308b", "ko": "\uacf5\uae09\uc5c5\uccb4 \ud45c\uc2dc", "nb": "Vis leverand\u00f8r", "nl": "Leverancier weergeven", "pl": "Poka\u017c dostawc\u0119", "pt-BR": "Exibir fabricante", "pt-PT": "Mostrar fornecedor", "sv": "Visa s\u00e4ljare", "th": "\u0e41\u0e2a\u0e14\u0e07\u0e1c\u0e39\u0e49\u0e02\u0e32\u0e22", "tr": "Sat\u0131c\u0131y\u0131 g\u00f6ster", "vi": "Hi\u1ec3n th\u1ecb nh\u00e0 cung c\u1ea5p", "zh-CN": "\u663e\u793a\u5382\u5546", "zh-TW": "\u986f\u793a\u5ee0\u5546"}, "default": false}, {"type": "checkbox", "id": "enable_payment_button", "label": {"cs": "Zobrazit dynamick\u00e9 tla\u010d\u00edtko pokladny", "da": "Vis dynamisk betalingsknap", "de": "Dynamischen Checkout Button anzeigen", "en": "Show dynamic checkout button", "es": "Mostrar bot\u00f3n de pago din\u00e1mico", "fi": "N\u00e4yt\u00e4 dynaaminen kassapainike", "fr": "Afficher le bouton de paiement dynamique", "it": "Mostra pulsante di check-out dinamico", "ja": "\u52d5\u7684\u30c1\u30a7\u30c3\u30af\u30a2\u30a6\u30c8\u30dc\u30bf\u30f3\u3092\u8868\u793a\u3059\u308b", "ko": "\ub3d9\uc801 \uacb0\uc81c \ubc84\ud2bc \ud45c\uc2dc", "nb": "Vis dynamisk knapp for \u00e5 g\u00e5 til kassen", "nl": "Dynamische checkoutknop weergeven", "pl": "Poka\u017c dynamiczny przycisk realizacji zakupu", "pt-BR": "Exibir bot\u00e3o de checkout din\u00e2mico", "pt-PT": "Mostrar o bot\u00e3o din\u00e2mico de finaliza\u00e7\u00e3o da compra", "sv": "Visa dynamiska utcheckningsknappar", "th": "\u0e41\u0e2a\u0e14\u0e07\u0e1b\u0e38\u0e48\u0e21\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19\u0e41\u0e1a\u0e1a\u0e44\u0e14\u0e19\u0e32\u0e21\u0e34\u0e01", "tr": "Dinamik \u00f6deme d\u00fc\u011fmesini g\u00f6ster", "vi": "Hi\u1ec3n th\u1ecb n\u00fat thanh to\u00e1n nhanh", "zh-CN": "\u663e\u793a\u52a8\u6001\u7ed3\u8d26\u6309\u94ae", "zh-TW": "\u986f\u793a\u52d5\u614b\u7d50\u5e33\u6309\u9215"}, "info": {"cs": "Ka\u017ed\u00fd z\u00e1kazn\u00edk uvid\u00ed platebn\u00ed metodu, kterou ze v\u0161ech metod dostupn\u00fdch v obchod\u011b (nap\u0159\u00edklad PayPal nebo Apple Pay) nejv\u00edce preferuje. [Dal\u0161\u00ed informace](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "da": "Den enkelte kunde vil se sin foretrukne betalingsmetode blandt dem, der er tilg\u00e6ngelige i din butik, f.eks. PayPal eller Apple Pay. [F\u00e5 mere at vide](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "de": "Jeder Kunde sieht seine bevorzugte Zahlungsmethode aus den in deinem Shop verf\u00fcgbaren Zahlungsmethoden wie PayPal oder Apple Pay. [Mehr Informationen](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "en": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "es": "Cada cliente ver\u00e1 su forma de pago preferida entre las disponibles en tu tienda, como PayPal o Apple Pay. [M\u00e1s informaci\u00f3n](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "fi": "Kukin asiakas n\u00e4kee ensisijaisen valintansa kauppasi tarjoamista maksutavoista, esim. PayPal tai Apple Pay. [Lis\u00e4tietoja](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "fr": "Chaque client verra son moyen de paiement pr\u00e9f\u00e9r\u00e9 parmi ceux qui sont propos\u00e9s sur votre boutique, tels que PayPal ou Apple Pay. [En savoir plus](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "it": "Ogni cliente vedr\u00e0 il suo metodo di pagamento preferito tra quelli disponibili nel tuo negozio, come PayPal o Apple Pay. [Maggiori informazioni](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "ja": "PayPal\u3084Apple Pay\u306a\u3069\u3001\u30b9\u30c8\u30a2\u3067\u5229\u7528\u53ef\u80fd\u306a\u5e0c\u671b\u306e\u6c7a\u6e08\u65b9\u6cd5\u304c\u304a\u5ba2\u69d8\u306b\u8868\u793a\u3055\u308c\u307e\u3059\u3002[\u8a73\u3057\u304f\u306f\u3053\u3061\u3089](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "ko": "\uac01 \uace0\uac1d\uc740 PayPal \ub610\ub294 Apple Pay\uc640 \uac19\uc774 \uc2a4\ud1a0\uc5b4\uc5d0\uc11c \uc0ac\uc6a9 \uac00\ub2a5\ud55c \uc9c0\ubd88 \ubc29\ubc95\uc744 \ud655\uc778\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. [\uc790\uc138\ud788 \uc54c\uc544\ubcf4\uae30](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "nb": "Hver enkelt kunde vil se sin foretrukne betalingsm\u00e5te blant de som er tilgjengelig i butikken din, som PayPal eller Apple Pay. [Finn ut mer](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "nl": "Elke klant ziet zijn of haar beschikbare voorkeursmethode om af te rekenen, zoals PayPal of Apple Pay. [Meer informatie](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "pl": "Ka\u017cdy klient zobaczy swoj\u0105 preferowan\u0105 metod\u0119 p\u0142atno\u015bci w\u015br\u00f3d metod dost\u0119pnych w Twoim sklepie, np. PayPal lub Apple Pay. [Dowiedz si\u0119 wi\u0119cej](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "pt-BR": "Cada cliente ver\u00e1 a forma de pagamento preferencial dele dentre as dispon\u00edveis na loja, como PayPal ou Apple Pay. [Saiba mais](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "pt-PT": "Cada cliente ir\u00e1 ver o seu m\u00e9todo de pagamento preferido entre os dispon\u00edveis na loja, como o PayPal ou Apple Pay. [Saiba mais](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "sv": "Varje kund kommer att se den f\u00f6redragna betalningsmetoden fr\u00e5n de som finns tillg\u00e4ngliga i din butik, till exempel PayPal eller Apple Pay. [L\u00e4s mer](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "th": "\u0e25\u0e39\u0e01\u0e04\u0e49\u0e32\u0e41\u0e15\u0e48\u0e25\u0e30\u0e23\u0e32\u0e22\u0e08\u0e30\u0e40\u0e2b\u0e47\u0e19\u0e27\u0e34\u0e18\u0e35\u0e01\u0e32\u0e23\u0e0a\u0e33\u0e23\u0e30\u0e40\u0e07\u0e34\u0e19\u0e17\u0e35\u0e48\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e08\u0e32\u0e01\u0e27\u0e34\u0e18\u0e35\u0e17\u0e35\u0e48\u0e43\u0e0a\u0e49\u0e44\u0e14\u0e49\u0e43\u0e19\u0e23\u0e49\u0e32\u0e19\u0e04\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e04\u0e38\u0e13 \u0e40\u0e0a\u0e48\u0e19 PayPal \u0e2b\u0e23\u0e37\u0e2d Apple Pay [\u0e14\u0e39\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e40\u0e15\u0e34\u0e21](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "tr": "Her m\u00fc\u015fteri, ma\u011fazan\u0131z sunulanlar aras\u0131ndan tercih ettikleri \u00f6deme y\u00f6ntemini g\u00f6r\u00fcr (\u00f6r. PayPal veya Apple Pay). [Daha fazla bilgi edinin](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "vi": "M\u1ed7i kh\u00e1ch h\u00e0ng s\u1ebd th\u1ea5y ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n \u01b0u ti\u00ean trong nh\u1eefng ph\u01b0\u01a1ng th\u1ee9c thanh to\u00e1n \u0111\u01b0\u1ee3c h\u1ed7 tr\u1ee3 t\u1ea1i c\u1eeda h\u00e0ng nh\u01b0 PayPal ho\u1eb7c Apple Pay. [T\u00ecm hi\u1ec3u th\u00eam](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "zh-CN": "\u6bcf\u4f4d\u5ba2\u6237\u90fd\u53ef\u5728\u60a8\u5546\u5e97\u63d0\u4f9b\u7684\u4ed8\u6b3e\u65b9\u5f0f\u4e2d\u770b\u5230\u4ed6\u4eec\u7684\u9996\u9009\u4ed8\u6b3e\u65b9\u5f0f\uff0c\u4f8b\u5982 PayPal \u6216 Apple Pay\u3002[\u4e86\u89e3\u8be6\u7ec6\u4fe1\u606f](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)", "zh-TW": "\u6bcf\u4f4d\u9867\u5ba2\u90fd\u53ef\u4ee5\u5728\u60a8\u5546\u5e97\u5167\u958b\u653e\u4f7f\u7528\u7684\u4ed8\u6b3e\u65b9\u5f0f\u4e2d\u770b\u898b\u4ed6\u5011\u504f\u597d\u4f7f\u7528\u7684\u65b9\u5f0f\uff0c\u5982 PayPal\u3001Apple Pay \u7b49\u3002[\u6df1\u5165\u77ad\u89e3](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)"}, "default": false}, {"type": "checkbox", "id": "show_share_buttons", "label": {"cs": "Zobrazit tla\u010d\u00edtka pro sd\u00edlen\u00ed na soci\u00e1ln\u00edch s\u00edt\u00edch", "da": "Vis knapper til deling p\u00e5 sociale medier", "de": "Buttons f\u00fcr Social Media anzeigen", "en": "Show social sharing buttons", "es": "Mostrar botones para compartir en redes sociales", "fi": "N\u00e4yt\u00e4 sosiaalisen median jakamispainikkeet", "fr": "Affichez les boutons de partage sur les m\u00e9dias sociaux", "it": "Mostra i pulsanti per la condivisione sui social", "ja": "\u30bd\u30fc\u30b7\u30e3\u30eb\u30e1\u30c7\u30a3\u30a2\u3067\u306e\u5171\u6709\u30dc\u30bf\u30f3\u3092\u8868\u793a\u3059\u308b", "ko": "\uc18c\uc15c \uacf5\uc720 \ubc84\ud2bc \ud45c\uc2dc", "nb": "Vis knapper for deling p\u00e5 sosiale medier", "nl": "Knoppen voor sociaal delen weergeven", "pl": "Poka\u017c przyciski udost\u0119pniania w mediach spo\u0142eczno\u015bciowych", "pt-BR": "Exibir bot\u00f5es de compartilhamento em redes sociais", "pt-PT": "Mostrar bot\u00f5es de partilha nas redes sociais", "sv": "Visa knappar f\u00f6r delning i sociala medier", "th": "\u0e41\u0e2a\u0e14\u0e07\u0e1b\u0e38\u0e48\u0e21\u0e2a\u0e33\u0e2b\u0e23\u0e31\u0e1a\u0e41\u0e0a\u0e23\u0e4c\u0e25\u0e07\u0e42\u0e0b\u0e40\u0e0a\u0e35\u0e22\u0e25", "tr": "Sosyal medya payla\u015f\u0131m d\u00fc\u011fmelerini g\u00f6ster", "vi": "Hi\u1ec3n th\u1ecb n\u00fat chia s\u1ebb qua m\u1ea1ng x\u00e3 h\u1ed9i", "zh-CN": "\u663e\u793a\u793e\u4ea4\u5206\u4eab\u6309\u94ae", "zh-TW": "\u986f\u793a\u793e\u7fa4\u5206\u4eab\u6309\u9215"}, "default": true}, {"type": "header", "content": {"cs": "Multim\u00e9dia", "da": "Medie", "de": "Medien", "en": "Media", "es": "Elementos multimedia", "fi": "Media", "fr": "Support multim\u00e9dia", "it": "Contenuti multimediali", "ja": "\u30e1\u30c7\u30a3\u30a2", "ko": "\ubbf8\ub514\uc5b4", "nb": "Medier", "nl": "Media", "pl": "Multimedia", "pt-BR": "M\u00eddia", "pt-PT": "Multim\u00e9dia", "sv": "Media", "th": "\u0e2a\u0e37\u0e48\u0e2d", "tr": "Medya", "vi": "N\u1ed9i dung \u0111a ph\u01b0\u01a1ng ti\u1ec7n", "zh-CN": "\u5a92\u4f53", "zh-TW": "\u5a92\u9ad4"}, "info": {"cs": "Dal\u0161\u00ed informace o [typech multim\u00e9di\u00ed](https://help.shopify.com/manual/products/product-media)", "da": "F\u00e5 mere at vide om [media types](https://help.shopify.com/manual/products/product-media)", "de": "Mehr Informationen \u00fcber [Medientypen ](https://help.shopify.com/manual/products/product-media)", "en": "Learn more about [media types](https://help.shopify.com/manual/products/product-media)", "es": "M\u00e1s informaci\u00f3n sobre [tipos de archivos multimedia](https://help.shopify.com/manual/products/product-media)", "fi": "Lue lis\u00e4\u00e4 [mediatyypeist\u00e4](https://help.shopify.com/manual/products/product-media)", "fr": "En savoir plus sur les [types de supports multim\u00e9dia](https://help.shopify.com/manual/products/product-media)", "it": "Scopri di pi\u00f9 sulle [tipologie di file multimediali](https://help.shopify.com/manual/products/product-media)", "ja": "[\u30e1\u30c7\u30a3\u30a2\u306e\u30bf\u30a4\u30d7](https://help.shopify.com/manual/products/product-media) \u306b\u3064\u3044\u3066\u8a73\u3057\u304f\u306f\u3053\u3061\u3089", "ko": "[\ubbf8\ub514\uc5b4 \uc720\ud615](https://help.shopify.com/manual/products/product-media)\uc5d0 \ub300\ud574 \uc790\uc138\ud788 \uc54c\uc544\ubcf4\uae30", "nb": "L\u00e6r mer om [medietyper](https://help.shopify.com/manual/products/product-media)", "nl": "Meer informatie over [mediatypen](https://help.shopify.com/manual/products/product-media)", "pl": "Dowiedz si\u0119 wi\u0119cej o [typach multimedi\u00f3w](https://help.shopify.com/manual/products/product-media)", "pt-BR": "Saiba mais sobre [tipos de m\u00eddia](https://help.shopify.com/manual/products/product-media)", "pt-PT": "Saiba mais sobre [media types](https://help.shopify.com/manual/products/product-media)", "sv": "L\u00e4s mer om [mediatyper](https://help.shopify.com/manual/products/product-media)", "th": "\u0e14\u0e39\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e40\u0e15\u0e34\u0e21\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e01\u0e31\u0e1a [\u0e1b\u0e23\u0e30\u0e40\u0e20\u0e17\u0e02\u0e2d\u0e07\u0e2a\u0e37\u0e48\u0e2d](https://help.shopify.com/manual/products/product-media)", "tr": "[Medya t\u00fcrleri](https://help.shopify.com/manual/products/product-media) hakk\u0131nda daha fazla bilgi edinin", "vi": "T\u00ecm hi\u1ec3u th\u00eam v\u1ec1 [lo\u1ea1i ph\u01b0\u01a1ng ti\u1ec7n](https://help.shopify.com/manual/products/product-media)", "zh-CN": "\u8be6\u7ec6\u4e86\u89e3[\u5a92\u4f53\u7c7b\u578b](https://help.shopify.com/manual/products/product-media)", "zh-TW": "\u6df1\u5165\u77ad\u89e3 [\u5a92\u9ad4\u985e\u578b](https://help.shopify.com/manual/products/product-media)"}}, {"type": "select", "id": "media_size", "label": {"cs": "Velikost", "da": "St\u00f8rrelse", "de": "Gr\u00f6\u00dfe", "en": "Size", "es": "Tama\u00f1o", "fi": "Koko", "fr": "Taille", "it": "Dimensione", "ja": "\u30b5\u30a4\u30ba", "ko": "\uc0ac\uc774\uc988", "nb": "St\u00f8rrelse", "nl": "Grootte", "pl": "Rozmiar", "pt-BR": "Tamanho", "pt-PT": "Tamanho", "sv": "Storlek", "th": "\u0e02\u0e19\u0e32\u0e14", "tr": "Boyut", "vi": "C\u1ee1", "zh-CN": "\u5c3a\u5bf8", "zh-TW": "\u5c3a\u5bf8"}, "options": [{"value": "small", "label": {"cs": "Mal\u00e1", "da": "Lille", "de": "Klein", "en": "Small", "es": "Peque\u00f1o", "fi": "Pieni", "fr": "Petit", "it": "Piccolo", "ja": "\u30b9\u30e2\u30fc\u30eb", "ko": "\uc2a4\ubab0", "nb": "Liten", "nl": "Klein", "pl": "Ma\u0142y", "pt-BR": "Pequeno", "pt-PT": "Pequeno", "sv": "Liten", "th": "\u0e40\u0e25\u0e47\u0e01", "tr": "K\u00fc\u00e7\u00fck", "vi": "Nh\u1ecf", "zh-CN": "\u5c0f", "zh-TW": "\u5c0f\u578b"}}, {"value": "medium", "label": {"cs": "St\u0159edn\u00ed", "da": "Medium", "de": "Mittel", "en": "Medium", "es": "Mediano", "fi": "Keskisuuri", "fr": "Moyenne", "it": "Medio", "ja": "\u4e2d", "ko": "\ubcf4\ud1b5", "nb": "Middels", "nl": "Gemiddeld", "pl": "\u015aredni", "pt-BR": "M\u00e9dio", "pt-PT": "M\u00e9dio", "sv": "Medium", "th": "\u0e1b\u0e32\u0e19\u0e01\u0e25\u0e32\u0e07", "tr": "Orta", "vi": "Trung b\u00ecnh", "zh-CN": "\u4e2d\u7b49", "zh-TW": "\u4e2d\u7b49"}}, {"value": "large", "label": {"cs": "Velk\u00e1", "da": "Stor", "de": "Gro\u00df", "en": "Large", "es": "Grande", "fi": "Suuri", "fr": "Grande", "it": "Grande", "ja": "\u5927", "ko": "\ub77c\uc9c0", "nb": "Stor", "nl": "Groot", "pl": "Du\u017cy", "pt-BR": "Grande", "pt-PT": "Grande", "sv": "Stor", "th": "\u0e43\u0e2b\u0e0d\u0e48", "tr": "B\u00fcy\u00fck", "vi": "L\u1edbn", "zh-CN": "\u5927", "zh-TW": "\u5927\u578b"}}, {"value": "full", "label": {"cs": "Pln\u00e1 \u0161\u00ed\u0159ka", "da": "Fuld bredde", "de": "Volle Breite", "en": "Full-width", "es": "Ancho completo", "fi": "T\u00e4ysi leveys", "fr": "Pleine largeur", "it": "Intera larghezza", "ja": "\u5168\u5e45", "ko": "\uc804\uccb4 \ud3ed", "nb": "Full bredde", "nl": "Volledige breedte", "pl": "Pe\u0142na szeroko\u015b\u0107", "pt-BR": "Largura completa", "pt-PT": "Largura completa", "sv": "Full bredd", "th": "\u0e40\u0e15\u0e47\u0e21\u0e04\u0e27\u0e32\u0e21\u0e01\u0e27\u0e49\u0e32\u0e07", "tr": "Tam geni\u015flikli", "vi": "\u0110\u1ed9 r\u1ed9ng \u0111\u1ea7y \u0111\u1ee7", "zh-CN": "\u5168\u5bbd", "zh-TW": "\u5b8c\u6574\u5bec\u5ea6"}}], "default": "medium"}, {"type": "checkbox", "id": "enable_image_zoom", "label": {"cs": "Povolit zv\u011bt\u0161en\u00ed obr\u00e1zku", "da": "Aktiv\u00e9r billedzoom", "de": "Foto-Zoom zulassen", "en": "Enable image zoom", "es": "Habilitar zoom de imagen", "fi": "Ota kuvan zoomaus k\u00e4ytt\u00f6\u00f6n", "fr": "Activer le zoom d'image", "it": "Abilita lo zoom dell'immagine", "ja": "\u753b\u50cf\u30ba\u30fc\u30e0\u3092\u6709\u52b9\u306b\u3059\u308b", "ko": "\uc774\ubbf8\uc9c0 \ud655\ub300 \uc0ac\uc6a9", "nb": "Aktiver bildezoom", "nl": "Inzoomen op afbeelding inschakelen", "pl": "W\u0142\u0105cz powi\u0119kszenie obrazu", "pt-BR": "Habilitar o zoom da imagem", "pt-PT": "Ativar o zoom da imagem", "sv": "Aktivera bildzoom", "th": "\u0e40\u0e1b\u0e34\u0e14\u0e43\u0e0a\u0e49\u0e01\u0e32\u0e23\u0e0b\u0e39\u0e21\u0e20\u0e32\u0e1e", "tr": "G\u00f6rsel yak\u0131nla\u015ft\u0131rmay\u0131 etkinle\u015ftir", "vi": "B\u1eadt thu ph\u00f3ng h\u00ecnh \u1ea3nh", "zh-CN": "\u542f\u7528\u56fe\u7247\u7f29\u653e", "zh-TW": "\u555f\u7528\u5716\u7247\u7e2e\u653e"}, "default": true}, {"type": "checkbox", "id": "enable_video_looping", "label": {"cs": "Povolit smy\u010dky videa", "da": "Aktiv\u00e9r looping af videoer", "de": "Videoschleife aktivieren", "en": "Enable video looping", "es": "Habilitar la reproducci\u00f3n de video en bucle", "fi": "Ota k\u00e4ytt\u00f6\u00f6n videosilmukka", "fr": "Activer le bouclage de la vid\u00e9o", "it": "Abilita la riproduzione in loop dei video", "ja": "\u30d3\u30c7\u30aa\u306e\u30eb\u30fc\u30d7\u3092\u6709\u52b9\u306b\u3059\u308b", "ko": "\ub3d9\uc601\uc0c1 \ub8e8\ud504", "nb": "Aktiver l\u00f8kkeavspilling av video", "nl": "Video-looping inschakelen", "pl": "W\u0142\u0105cz zap\u0119tlanie wideo", "pt-BR": "Habilitar loop de v\u00eddeo", "pt-PT": "Ativar ciclo de v\u00eddeo", "sv": "Aktivera video-loopning", "th": "\u0e40\u0e1b\u0e34\u0e14\u0e43\u0e0a\u0e49\u0e01\u0e32\u0e23\u0e27\u0e19\u0e0b\u0e49\u0e33\u0e27\u0e34\u0e14\u0e35\u0e42\u0e2d", "tr": "Video d\u00f6ng\u00fcs\u00fcn\u00fc etkinle\u015ftir", "vi": "B\u1eadt v\u00f2ng l\u1eb7p video", "zh-CN": "\u542f\u7528\u89c6\u9891\u5faa\u73af", "zh-TW": "\u555f\u7528\u5f71\u7247\u5faa\u74b0\u529f\u80fd"}, "default": false}]}{% endschema %}
