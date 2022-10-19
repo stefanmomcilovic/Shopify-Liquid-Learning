@@ -167,8 +167,8 @@
                   {% if option.name == 'Color' %}
                     {% if product.metafields.product_group.name != blank %}
                         <div class="selector-wrapper js product-form__item">
-                            {% assign product_group_color = product.metafields.product_group.color  %}
-                             {{ product_group_color.value }}
+                            {% assign product_group_color = product.metafields.product_group.color.value | split: '#'  %}
+                             {{ product_group_color | json }}
                           <label for="SingleOptionSelector-{{ forloop.index0 }}" style="">
                             {{ option.name }}
                           </label>
