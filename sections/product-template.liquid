@@ -166,11 +166,11 @@
                 {% for option in product.options_with_values %}
                   {% if option.name == 'Color' %}
                     {% if product.metafields.product_group.name != blank %}
-                        <div class="selector-wrapper js product-form__item">
+                        <div class="selector-wrapper js">
                            {% assign product_group_color = product.metafields.product_group.color.value  %}
                       
                            {% for color in product_group_color limit: option.values.size %}  
-                            <label for="SingleOptionSelector-{{ forloop.index0 }}"style="background-color: {{ color }}; border-radius: 50%;">
+                            <label for="SingleOptionSelector-{{ forloop.index0 }}"style="background-color: {{ color }}; border-radius: 50%; height: 50px; width: 50px;">
                               &nbsp;
                             </label>
                             {% endfor %}                           
