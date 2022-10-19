@@ -167,7 +167,7 @@
                   {% if option.name == 'Color' %}
                     {% if product.metafields.product_group.name != blank %}
                         <div class="selector-wrapper js product-form__item">
-                           {{ option.values.length }}
+                           {{ option.values | json }}
                           <label for="SingleOptionSelector-{{ forloop.index0 }}">
                             {{ option.name }}
                           </label>
