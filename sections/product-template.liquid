@@ -168,13 +168,13 @@
                     {% if product.metafields.product_group.name != blank %}
                         <div class="selector-wrapper js product-form__item">
                            {% for color in product.metafields.product_group.color %}
-                                        {{ color }}
+                                       <h2> {{ color }} </h2>
                             {% endfor %}
                           <label for="SingleOptionSelector-{{ forloop.index0 }}" style="">
                             {{ option.name }}
                           </label>
                           {{ product.metafields.product_group.name }}
-                           {{ product.metafields.product_group.color }}
+                           
                         </div>
                       {% else %}
                     <div class="selector-wrapper js product-form__item">
