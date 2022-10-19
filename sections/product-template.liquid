@@ -167,7 +167,8 @@
                   {% if option.name == 'Color' %}
                     {% if product.metafields.product_group.name != blank %}
                         <div class="selector-wrapper js product-form__item">
-                            {% assign product_group_color = product.metafields.product_group.color.value | split: '#'  %}
+                            {% assign product_group_color = product.metafields.product_group.color.value  %}
+                         <p>{{ product_group_color }} ee</p>
                              {% for color in product_group_color %}
                                   <p>{{ color }}</p>
                               {% endfor %}
