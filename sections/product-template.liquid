@@ -170,7 +170,7 @@
                            {% assign product_group_color = product.metafields.product_group.color.value  %}
                       
                            {% for color in product_group_color limit: option.values.size %}  
-                            <label for="SingleOptionSelector-{{ forloop.index0 }}"style="background-color: {{ color }};">
+                            <label for="SingleOptionSelector-{{ forloop.index0 }}"style="background-color: {{ color }}; border-radius: 50%;">
                               &nbsp;
                             </label>
                             {% endfor %}                           
