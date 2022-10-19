@@ -162,7 +162,7 @@
             {{ form | payment_terms }}
 
             {% unless product.has_only_default_variant %}
-              <div class="product-form__controls-group">
+              <div class="product-form__controls-group" style="flex-direction: column;">
                 {% for option in product.options_with_values %}
                   {% if option.name == 'Color' %}
                     {% if product.metafields.product_group.name != blank %}
