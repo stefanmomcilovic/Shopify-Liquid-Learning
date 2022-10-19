@@ -166,7 +166,7 @@
                 {% for option in product.options_with_values %}
                   <div class="selector-wrapper js product-form__item">
                     <label for="SingleOptionSelector-{{ forloop.index0 }}">
-                      {{ option.name }}
+                      {{ option.name }} {{ option | json }}
                     </label>
                     <select class="single-option-selector single-option-selector-{{ section.id }} product-form__input"
                       id="SingleOptionSelector-{{ forloop.index0 }}"
