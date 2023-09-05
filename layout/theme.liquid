@@ -9,6 +9,36 @@
   <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
   <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
   <link rel="preconnect" href="https://monorail-edge.shopifysvc.com">
+  <script type="text/javascript">
+    const observer = new MutationObserver((e) => {
+      e.forEach(({ addedNodes: e }) => {
+        e.forEach((e) => {
+          1 === e.nodeType &&
+            "SCRIPT" === e.tagName &&
+            (e.innerHTML.includes("asyncLoad") &&
+              (e.innerHTML = e.innerHTML
+                .replace(
+                  "if(window.attachEvent)",
+                  "document.addEventListener('asyncLazyLoad',function(event){asyncLoad();});if(window.attachEvent)"
+                )
+                .replaceAll(", asyncLoad", ", function(){}")),
+            e.innerHTML.includes("PreviewBarInjector") &&
+              (e.innerHTML = e.innerHTML.replace(
+                "DOMContentLoaded",
+                "asyncLazyLoad"
+              )),
+            e.className == "analytics" && (e.type = "text/lazyload"),
+            (e.src.includes("assets/storefront/features") ||
+              e.src.includes("assets/shopify_pay") ||
+              e.src.includes("connect.facebook.net")) &&
+              (e.setAttribute("data-src", e.src), e.removeAttribute("src")));
+        });
+      });
+    });
+    observer.observe(document.documentElement, { childList: !0, subtree: !0 });
+  </script>
+  <script src="//cdn.shopify.com/s/files/1/0814/0259/3584/t/1/assets/preconnect.js" type="text/javascript"></script>
+  <script src="//cdn.shopify.com/s/files/1/0814/0259/3584/t/1/assets/preload.js" type="text/javascript"></script>
 
   {%- assign header_font = settings.type_header_font -%}
   {%- assign base_font = settings.type_base_font -%}
