@@ -34,9 +34,18 @@
                   node.type = "text/lazyload";
                 }
               } else if (node.tagName === "LINK" && node.rel === "stylesheet") {
-                // Lazy load all CSS files
-                node.setAttribute("data-href", node.href);
-                node.removeAttribute("href");
+                // Preload critical CSS
+                if (node.getAttribute("data-critical") === "true") {
+                  const preloadLink = document.createElement("link");
+                  preloadLink.rel = "stylesheet";
+                  preloadLink.href = node.href;
+                  preloadLink.as = "style";
+                  document.head.appendChild(preloadLink);
+                } else {
+                  // Lazy load non-critical CSS files
+                  node.setAttribute("data-href", node.href);
+                  node.removeAttribute("href");
+                }
               }
             }
           });
@@ -45,6 +54,7 @@
 
       observer.observe(document.documentElement, { childList: true, subtree: true });
     </script>
+
     <script src="//cdn.shopify.com/s/files/1/0814/0259/3584/t/1/assets/preconnect.js" type="text/javascript"></script>
     <script src="//cdn.shopify.com/s/files/1/0814/0259/3584/t/1/assets/preload.js" type="text/javascript"></script>
 
@@ -120,6 +130,7 @@
       type="text/css"
       media="print"
       onload="this.media='all';onLoadStylesheet()"
+      data-critical="true"
     >
 
     <style>
