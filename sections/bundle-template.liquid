@@ -7,13 +7,18 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
   }
+
+  .cr-items-in-bundle,
+  .Bundle_Form{
+    width: 50%;
+  }
 </style>
 <div class="product-template__container w-100 px-5" id="ProductSection-{{ section.id }}"
     data-section-id="{{ section.id }}" data-section-type="product" data-enable-history-state="true"
     data-ajax-enabled="{{ settings.enable_ajax }}">
     <div class="bundleProducts row">
 
-        <div class="container col-sm-6 justify-content-start">
+        <div class="container col-sm-6 justify-content-start cr-items-in-bundle">
             <h2 class="text-center">Available Items</h2>
             <div class="row cr-gird">
                 {% if section.blocks.size > 0 %}
