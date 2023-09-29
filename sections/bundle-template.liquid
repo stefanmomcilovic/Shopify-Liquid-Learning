@@ -1,3 +1,9 @@
+<style>
+  .cr-gird {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+</style>
 <div class="product-template__container w-100 px-5" id="ProductSection-{{ section.id }}"
     data-section-id="{{ section.id }}" data-section-type="product" data-enable-history-state="true"
     data-ajax-enabled="{{ settings.enable_ajax }}">
@@ -5,7 +11,7 @@
 
         <div class="container col-sm-6 justify-content-start">
             <h2 class="text-center">Available Items</h2>
-            <div class="row">
+            <div class="row cr-gird">
                 {% if section.blocks.size > 0 %}
                 {% for block in section.blocks %}
                 {% if block.settings.bundle_product != blank %}
