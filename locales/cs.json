@@ -1,5 +1,19 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin language editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "general": {
+    "404": {
+      "title": "404 Stránka nenalezena",
+      "subtext": "Stránka, o kterou žádáte, neexistuje.",
+      "link": "Pokračovat v nákupu"
+    },
     "accessibility": {
       "skip_to_content": "Přeskočit na obsah",
       "close_modal": "Zavřít",
@@ -17,15 +31,10 @@
       "tags": "Označeno „{{ tags }}“",
       "page": "Strana {{ page }}"
     },
-    "404": {
-      "title": "404 Stránka nenalezena",
-      "subtext": "Stránka, o kterou žádáte, neexistuje.",
-      "link": "Pokračovat v nákupu"
-    },
     "pagination": {
       "previous": "Předchozí stránka",
       "next": "Další stránka",
-      "current_page": "Strana {{ current }}\/{{ total }}"
+      "current_page": "Strana {{ current }}/{{ total }}"
     },
     "password_page": {
       "opening_soon": "Brzy se otevře",
@@ -35,7 +44,7 @@
       "login_form_submit": "Zadat",
       "signup_form_email_label": "E-mail",
       "signup_form_success": "Těsně než otevřeme, pošleme vám e-mail!",
-      "admin_link_html": "Jste majitelem obchodu? <a href=\"\/admin\" class=\"text-link\">Přihlaste se zde<\/a>",
+      "admin_link_html": "Jste majitelem obchodu? <a href=\"/admin\" class=\"text-link\">Přihlaste se zde</a>",
       "password_link": "Vstoupit pomocí hesla"
     },
     "social": {
@@ -57,7 +66,7 @@
       "search_for": "Vyhledat:",
       "loading": "Načítání",
       "clear_search_term": "Vymazat hledaný termín",
-      "number_of_results": "{{ result_number }}\/{{ results_count }}",
+      "number_of_results": "{{ result_number }}/{{ results_count }}",
       "products": "Produkty",
       "number_of_results_found": "Počet nalezených výsledků: {{ results_count }}",
       "one_result_found": "Počet nalezených výsledků: 1",
@@ -92,7 +101,7 @@
       "dropdown_label": "Jazyk"
     },
     "country": {
-      "dropdown_label": "Země\/oblast"
+      "dropdown_label": "Země/oblast"
     }
   },
   "sections": {
@@ -113,7 +122,7 @@
     "map": {
       "address_error": "Chyba při hledání této adresy",
       "address_no_results": "Žádné výsledky pro tuto adresu",
-      "address_query_limit_html": "Je překročen limit použití API Google. Zvažte upgrade na <a href=\"https:\/\/developers.google.com\/maps\/premium\/usage-limits\">plán Premium<\/a>.",
+      "address_query_limit_html": "Je překročen limit použití API Google. Zvažte upgrade na <a href=\"https://developers.google.com/maps/premium/usage-limits\">plán Premium</a>.",
       "auth_error_html": "Při ověřování vašeho účtu Map Google došlo k problému.",
       "section_heading": "Lokalita"
     },
@@ -167,14 +176,14 @@
     "general": {
       "title": "Váš košík",
       "note": "Přidejte poznámku ke své objednávce",
-      "removed_item_html": "Odstraněno <span class=\"cart__removed-product-details\">({{ quantity }}) {{ link }}<\/span> z vašeho košíku.",
+      "removed_item_html": "Odstraněno <span class=\"cart__removed-product-details\">({{ quantity }}) {{ link }}</span> z vašeho košíku.",
       "remove": "Odstranit",
       "subtotal": "Mezisoučet",
       "savings": "Ušetříte",
       "taxes_and_shipping_at_checkout": "Daně a poštovné se vypočítají v pokladně",
-      "taxes_and_shipping_policy_at_checkout_html": "Daně a <a href=\"{{ link }}\">poštovné<\/a> se vypočítá v pokladně",
+      "taxes_and_shipping_policy_at_checkout_html": "Daně a <a href=\"{{ link }}\">poštovné</a> se vypočítá v pokladně",
       "taxes_included_but_shipping_at_checkout": "Daně a poštovné se vypočítají v pokladně",
-      "taxes_included_and_shipping_policy_html": "Včetně daní. <a href=\"{{ link }}\">Poštovné<\/a> se vypočítá v pokladně.",
+      "taxes_included_and_shipping_policy_html": "Včetně daní. <a href=\"{{ link }}\">Poštovné</a> se vypočítá v pokladně.",
       "update": "Aktualizovat",
       "checkout": "Pokladna",
       "empty": "Váš košík je momentálně prázdný.",
@@ -269,7 +278,7 @@
       "address1": "Adresa",
       "address2": "Byt, apartmán atd.",
       "city": "Město",
-      "country": "Země\/region",
+      "country": "Země/region",
       "province": "Provincie",
       "zip": "PSČ",
       "phone": "Telefon",
@@ -399,7 +408,7 @@
       "vendor": "Dodavatel",
       "quantity_minimum_message": "Množství musí být jedna nebo více",
       "include_taxes": "Včetně daní.",
-      "shipping_policy_html": "<a href=\"{{ link }}\">Poštovné<\/a> se vypočítá v pokladně.",
+      "shipping_policy_html": "<a href=\"{{ link }}\">Poštovné</a> se vypočítá v pokladně.",
       "unit_price_label": "Jednotková cena",
       "view_cart": "Zobrazit košík",
       "availability": "Dostupnost",
@@ -430,8 +439,53 @@
       "check_other_stores": "Zkontrolovat dostupnost v ostatních obchodech",
       "pick_up_available": "Vyzvednutí k dispozici",
       "pick_up_currently_unavailable": "Vyzvednutí není momentálně k dispozici",
-      "pick_up_available_at_html": "Vyzvednutí k dispozici v lokalitě <strong>{{ location_name }}<\/strong>",
-      "pick_up_unavailable_at_html": "Vyzvednutí není momentálně v lokalitě <strong>{{ location_name }}<\/strong> k dispozici"
+      "pick_up_available_at_html": "Vyzvednutí k dispozici v lokalitě <strong>{{ location_name }}</strong>",
+      "pick_up_unavailable_at_html": "Vyzvednutí není momentálně v lokalitě <strong>{{ location_name }}</strong> k dispozici"
+    }
+  },
+  "pagefly": {
+    "products": {
+      "product": {
+        "regular_price": "Regular price",
+        "sold_out": "Sold out",
+        "unavailable": "Unavailable",
+        "on_sale": "Sale",
+        "quantity": "Quantity",
+        "add_to_cart": "Add to cart",
+        "back_to_collection": "Back to {{ title }}",
+        "view_details": "View details"
+      }
+    },
+    "article": {
+      "tags": "Tags:",
+      "all_topics": "All topics",
+      "by_author": "by {{ author }}",
+      "posted_in": "Posted in",
+      "read_more": "Read more",
+      "back_to_blog": "Back to {{ title }}"
+    },
+    "comments": {
+      "title": "Leave a comment",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "post": "Post comment",
+      "moderated": "Please note, comments must be approved before they are published",
+      "success_moderated": "Your comment was posted successfully. We will publish it in a little while, as our blog is moderated.",
+      "success": "Your comment was posted successfully! Thank you!",
+      "comments_with_count": {
+        "one": "{{ count }} comment",
+        "other": "{{ count }} comments"
+      }
+    },
+    "password_page": {
+      "login_form_message": "Enter store using password:",
+      "login_form_password_label": "Password",
+      "login_form_password_placeholder": "Your password",
+      "login_form_submit": "Enter",
+      "signup_form_email_label": "Email",
+      "signup_form_success": "We will send you an email right before we open!",
+      "password_link": "Enter using password"
     }
   }
 }
